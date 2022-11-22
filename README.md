@@ -6,7 +6,7 @@ Repadapter is a parameter-efficient and computationally friendly adapter for gia
 
 
 <p align="center">
-	<img src="./misc/RepAdapter.jpg" width="550">
+	<img src="./misc/RepAdapter.jpg" width="1000">
 </p>
 
 ## Updates 
