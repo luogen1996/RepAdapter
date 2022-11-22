@@ -1,0 +1,3 @@
+name: cifar
+class_num: 100
+scale: 0.1
