@@ -13,9 +13,9 @@ Repadapter is a parameter-efficient and computationally friendly adapter for gia
 - (2022/11/22) Release our RepAdapter project.
 
 ## Data Preparation
-We provide two ways for preparing the datasets:
+We provide two ways for preparing VTAB-1k:
 - Download the source datasets, please refer to [NOAH](https://github.com/ZhangYuanhan-AI/NOAH/#data-preparation).
-- We provide the prepared datasets, which can be download from [here]().
+- We provide the prepared datasets, which can be download from [here](https://1drv.ms/u/s!AmrFUyZ_lDVGinv8y53HX3_rLrpq?e=P5EN5G).
 
 After that, the file structure should look like:
 ```
@@ -49,8 +49,8 @@ python test.py --method repblock --dataset <dataset-name>
 
 | Methods         | Natural | Specialized | Structured | Average |     logs     |  checkpoints |
 |-----------------|:-------:|:-----------:|:----------:|:-------:|:------------:|:------------:|
-| RepAdapter_attn |   82.63 |       85.87 |      62.86 |   77.12 | [onedrive]() |  [onedrive]() |
-| RepAdapter      |  82.87  |       86.04 |      63.29 |  77.40  |  [onedrive]() |  [onedrive]() |
+| RepAdapter_attn |   82.63 |       85.87 |      62.86 |   77.12 | [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinn6dsEqAweEHWBi?e=er4k4a) |  [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinf0EHBMZF7MCWC3?e=RNE8de) |
+| RepAdapter      |  82.87  |       86.04 |      63.29 |  77.40  |  [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinoPLzy6F4kexq4-?e=khVuIQ) |  [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinh6eN3AJfQbwua0?e=zvfrup) |
 
 #### Performance of each dataset
 
