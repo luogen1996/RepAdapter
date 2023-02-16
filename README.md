@@ -44,18 +44,4 @@ bash train_repblock.sh
 python test.py --method repblock --dataset <dataset-name> 
 ```
 
-### Performance on VTAB-1k (seed = 42)
-#### Overall performance on vtab-1k
-
-| Methods         | Natural | Specialized | Structured | Average |     logs     |  checkpoints |
-|-----------------|:-------:|:-----------:|:----------:|:-------:|:------------:|:------------:|
-| RepAdapter_attn |   82.63 |       85.87 |      62.86 |   77.12 | [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinn6dsEqAweEHWBi?e=er4k4a) |  [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinf0EHBMZF7MCWC3?e=RNE8de) |
-| RepAdapter      |  82.87  |       86.04 |      63.29 |  77.40  |  [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinoPLzy6F4kexq4-?e=khVuIQ) |  [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinh6eN3AJfQbwua0?e=zvfrup) |
-
-#### Performance of each dataset
-
-| Methods         | cifar | caltech101 |  dtd  | flower102 |  pets |  SVHN | sun397 | Camelyon | EuroSAT | Resisc45 | Retinopathy | Clevr-count | Clevr-dist | DMLab | Kitti-dist | Dspr-loc | Dspr-ori | sNORB-Azim | sNORB-Ele |
-|-----------------|:-----:|:----------:|:-----:|:---------:|:-----:|:-----:|:------:|:--------:|:-------:|:--------:|:-----------:|:-----------:|:----------:|:-----:|:----------:|:--------:|:--------:|:----------:|:---------:|
-| RepAdapter_attn | 75.7  |    92.2    | 72.5  |   99.3    | 92.2  | 90.8  |  57.5  |   86.9   |  96.0   |   85.7   |    75.5     |    82.4     |    64.1    | 52.3  |    81.9    |   86.6   |   54.3   |    38.0    |   46.9    |
-| RepAdapter      | 75.4  |    91.2    | 73.9  |   99.3    | 91.5  | 89.8  |  57.6  |   87.0   |  95.9   |   85.3   |    75.4     |    83.0     |    64.8    | 53.1  |    81.6    |   85.6   |   53.5   |    35.4    |   46.0    |
  
