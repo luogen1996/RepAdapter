@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
     model.cuda()
     throughput(model)
-    train_dl, test_dl = get_data(args.dataset,few_shot=args.few_shot,mean=model.default_cfg['mean'],std=model.default_cfg['std'])
+    train_dl, test_dl = get_data(args.dataset,few_shot=args.few_shot)
 
     set_RepAdapter(model, args.method, dim=args.dim, s=config['scale'] if args.scale==0 else args.scale, args=args)
     model.cuda()
