@@ -10,7 +10,7 @@ Repadapter is a parameter-efficient and computationally friendly adapter for gia
 </p>
 
 ## Updates 
-- (2022/11/22) Release our RepAdapter project.
+- (2023/02/16) Release our RepAdapter project.
 
 ## Data Preparation
 We provide two ways for preparing VTAB-1k:
