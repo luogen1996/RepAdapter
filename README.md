@@ -46,5 +46,12 @@ python test.py --method repblock --dataset <dataset-name>
 ## Citation
 
 If this repository is helpful for your research, or you want to refer the provided results in your paper, consider cite:
-
+```BibTeX
+@article{luo2023towards,
+  title={Towards Efficient Visual Adaption via Structural Re-parameterization},
+  author={Luo, Gen and Huang, Minglang and Zhou, Yiyi  and Sun, Xiaoshuai and Jiang, Guangnan and Wang, Zhiyu and Ji, Rongrong},
+  journal={arXiv preprint arXiv},
+  year={2023}
+}
+```
  
