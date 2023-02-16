@@ -43,5 +43,8 @@ bash train_repblock.sh
 ```sh 
 python test.py --method repblock --dataset <dataset-name> 
 ```
+## Citation
+
+If this repository is helpful for your research, or you want to refer the provided results in your paper, consider cite:
 
  
