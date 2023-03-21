@@ -2,7 +2,7 @@
 
 Official implementation of "[Towards Efficient Visual Adaption via Structural Re-parameterization](https://arxiv.org/pdf/2302.08106.pdf)".
 Repadapter is a parameter-efficient and computationally friendly adapter for giant vision models, which can be seamlessly integrated into most
- vision models via structural re-parameterization.
+ vision models via structural re-parameterization. Compared to Full Tuning, RepAdapter saves up to 25% training time, 20% GPU memory, and 94.6% storage cost of ViT-B/16 on VTAB-1k.
 
 
 <p align="center">
