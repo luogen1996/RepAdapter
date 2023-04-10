@@ -15,7 +15,7 @@ Repadapter is a parameter-efficient and computationally friendly adapter for gia
 ## Data Preparation
 We provide two ways for preparing VTAB-1k:
 - Download the source datasets, please refer to [NOAH](https://github.com/ZhangYuanhan-AI/NOAH/#data-preparation).
-- We provide the prepared datasets, which can be download from [here](https://1drv.ms/u/s!AmrFUyZ_lDVGinv8y53HX3_rLrpq?e=P5EN5G).
+- We provide the prepared datasets, which can be download from [onedrive](https://1drv.ms/u/s!AmrFUyZ_lDVGinv8y53HX3_rLrpq?e=P5EN5G) or [google drive](https://drive.google.com/file/d/1tfflwfG5H0RWzjwBMlmcAa4FsxeG3d51/view?usp=share_link).
 
 After that, the file structure should look like:
 ```
