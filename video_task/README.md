@@ -2,9 +2,6 @@
 
 This is a PyTorch implementation used for video task. 
 
-### Catalog
-
-- [x] Video code
 
 ### Usage
 
