@@ -24,31 +24,40 @@ from utils import *
 from repadapter import set_RepAdapter
 from torch import nn
 from timm.data import Mixup
-from timm.loss import  SoftTargetCrossEntropy
+from timm.loss import SoftTargetCrossEntropy
 
-def train(config, model, dl, opt, scheduler, epoch,mixup_fn=None,criterion=nn.CrossEntropyLoss()):
+
+def train(config, model, dl, opt, scheduler, epoch, mixup_fn=None, criterion=nn.CrossEntropyLoss(), model_folder=None):
     model.train()
     model = model.cuda()
-    for ep in tqdm(range(epoch)):
-        model.train()
-        model = model.cuda()
-        # pbar = tqdm(dl)
-        for i, batch in enumerate(dl):
-            x, y = batch[0].cuda(), batch[1].cuda()
-            if mixup_fn is not None:
-                x,y=mixup_fn(x,y)
-            out = model(x)
-            loss = criterion(out, y)
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
-        if scheduler is not None:
-            scheduler.step(ep)
-        if ep % 10 == 9:
-            acc = test(model, test_dl)
-            if acc > config['best_acc']:
-                config['best_acc'] = acc
-                save(config['method'], config['name'], model, acc, ep)
+    with tqdm(total=epoch, desc='Training Progress') as pbar:
+        for ep in range(epoch):
+            model.train()
+            model = model.cuda()
+
+            for i, batch in enumerate(dl):
+                x, y = batch[0].cuda(), batch[1].cuda()
+                if mixup_fn is not None:
+                    x, y = mixup_fn(x, y)
+                out = model(x)
+                loss = criterion(out, y)
+
+                loss_rep = 0
+                for name, param in model.named_parameters():
+                    if 'adapter_attn.conv_B' in name or 'adapter_mlp.conv_B' in name:
+                        loss_rep += float(args.sparse_lambda) * torch.norm(param, p=2)
+                pbar.set_postfix({'loss': loss, 'loss_rep': loss_rep}, refresh=True)
+                opt.zero_grad()
+                (loss + loss_rep).backward()
+                opt.step()
+            if scheduler is not None:
+                scheduler.step(ep)
+            if ep % 10 == 9:
+                acc = test(model, test_dl)
+                if acc > config['best_acc']:
+                    config['best_acc'] = acc
+                    save(model_folder, config['method'], config['name'], model, acc, ep)
+            pbar.update(1)
     model = model.cpu()
     return model
 
@@ -57,7 +66,7 @@ def train(config, model, dl, opt, scheduler, epoch,mixup_fn=None,criterion=nn.Cr
 def test(model, dl):
     model.eval()
     acc = Accuracy()
-    #pbar = tqdm(dl)
+    # pbar = tqdm(dl)
     model = model.cuda()
     for batch in dl:  # pbar:
         x, y = batch[0].cuda(), batch[1].cuda()
@@ -72,61 +81,67 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--wd', type=float, default=1e-4)
-    parser.add_argument('--model', type=str, default='vit_base_patch16_224_in21k', choices=['vit_base_patch16_224_in21k','swin_base_patch4_window7_224_in22k','convnext_base_22k_224']) #swin_tiny_patch4_window7_224
+    parser.add_argument('--model', type=str, default='vit_base_patch16_224_in21k',
+                        choices=['vit_base_patch16_224_in21k', 'swin_base_patch4_window7_224_in22k',
+                                 'convnext_base_22k_224'])  # swin_tiny_patch4_window7_224
     parser.add_argument('--dataset', type=str, default='cifar')
-    parser.add_argument('--method', type=str, default='repblock',choices=['repattn','repblock'])
+    parser.add_argument('--method', type=str, default='repblock', choices=['repattn', 'repblock'])
     parser.add_argument('--scale', type=float, default=0)
     parser.add_argument('--dim', type=int, default=8)
-    parser.add_argument('--few-shot',  action='store_true')
-    parser.add_argument('--shots',   type=int, default=1)
+    parser.add_argument('--few-shot', action='store_true')
+    parser.add_argument('--shots', type=int, default=1)
+    parser.add_argument('--sparse_lambda', type=float, default=1.)
+    parser.add_argument('--model_folder', type=str, default='models')
     args = parser.parse_args()
     print(args)
     set_seed(args.seed)
-    config = get_config(args.method, args.dataset,args.few_shot)
+    config = get_config(args.method, args.dataset, args.few_shot)
 
-    #mkdir for logs and models
+    model_folder = args.model_folder
+
+    # mkdir for logs and models
     if not os.path.exists('./logs'):
         os.mkdir('./logs')
-    if not os.path.exists('./models/%s'%(args.method)):
-        os.makedirs('./models/%s'%(args.method))
-
+    if not os.path.exists('./%s/%s' % (model_folder, args.method)):
+        os.makedirs('./%s/%s' % (model_folder, args.method))
 
     if 'vit' in args.model:
-        model = create_model(args.model, drop_path_rate=0.1,checkpoint_path='./ViT-B_16.npz')
+        model = create_model(args.model, drop_path_rate=0.1, checkpoint_path='./ViT-B_16.npz')
     elif 'swin' in args.model:
-        model = create_model(args.model, drop_path_rate=0.1,pretrained=True)
+        model = create_model(args.model, drop_path_rate=0.1, pretrained=True)
     elif 'conv' in args.model:
-        model = create_model(args.model, drop_path_rate=0.1,pretrained=True)
+        model = create_model(args.model, drop_path_rate=0.1, pretrained=True)
     else:
         assert NotImplementedError
 
     model.cuda()
     throughput(model)
-    train_dl, test_dl = get_data(args.dataset,few_shot=args.few_shot)
+    train_dl, test_dl = get_data(args.dataset, few_shot=args.few_shot)
 
-    set_RepAdapter(model, args.method, dim=args.dim, s=config['scale'] if args.scale==0 else args.scale, args=args)
+    set_RepAdapter(model, args.method, dim=args.dim, s=config['scale'] if args.scale == 0 else args.scale, args=args)
+
     model.cuda()
     throughput(model)
 
-    if hasattr(model,'blocks'):
+    if hasattr(model, 'blocks'):
         print(model.blocks[0])
-    elif hasattr(model,'layers'):
+    elif hasattr(model, 'layers'):
         print(model.layers[0])
-    elif hasattr(model,'stages'):
+    elif hasattr(model, 'stages'):
         print(model.stages[0])
     else:
         assert NotImplementedError
 
     trainable = []
     model.reset_classifier(config['class_num'])
-    
+
     config['best_acc'] = 0
     config['method'] = args.method
-    total=0
+    total = 0
     for n, p in model.named_parameters():
         if 'adapter' in n or 'head' in n:
             trainable.append(p)
-            total+=p.nelement()
+            total += p.nelement()
         else:
             p.requires_grad = False
     print('  + Number of trainable params: %.2fK' % (total / 1e3))  # 每一百万为一个单位
@@ -134,13 +149,14 @@ if __name__ == '__main__':
     scheduler = CosineLRScheduler(opt, t_initial=100,
                                   warmup_t=10, lr_min=1e-5, warmup_lr_init=1e-6, cycle_decay=0.1)
     if args.few_shot:
-        mixup_fn=Mixup(
+        mixup_fn = Mixup(
             mixup_alpha=0.8, cutmix_alpha=1.0, cutmix_minmax=None,
             prob=1.0, switch_prob=0.5, mode='batch',
             label_smoothing=0.1, num_classes=config['class_num'])
         criterion = SoftTargetCrossEntropy()
     else:
-        mixup_fn=None
+        mixup_fn = None
         criterion = torch.nn.CrossEntropyLoss()
-    model = train(config, model, train_dl, opt, scheduler, epoch=100,mixup_fn=mixup_fn,criterion=criterion)
+    model = train(config, model, train_dl, opt, scheduler, epoch=100, mixup_fn=mixup_fn, criterion=criterion,
+                  model_folder=model_folder)
     print(config['best_acc'])

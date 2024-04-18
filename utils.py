@@ -19,6 +19,7 @@ import time
 import numpy as np
 import torch
 
+
 def set_seed(seed=0):
     np.random.seed(seed)
     random.seed(seed)
@@ -28,11 +29,12 @@ def set_seed(seed=0):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+
 @torch.no_grad()
-def throughput(model,img_size=224,bs=1):
+def throughput(model, img_size=224, bs=1):
     with torch.no_grad():
         x = torch.randn(bs, 3, img_size, img_size).cuda()
-        batch_size=x.shape[0]
+        batch_size = x.shape[0]
         # model=create_model('vit_base_patch16_224_in21k', checkpoint_path='./ViT-B_16.npz', drop_path_rate=0.1)
         model.eval()
         for i in range(50):
@@ -48,26 +50,27 @@ def throughput(model,img_size=224,bs=1):
         MB = 1024.0 * 1024.0
         print('memory:', torch.cuda.max_memory_allocated() / MB)
 
+
 @torch.no_grad()
-def save(method, dataset, model, acc, ep):
+def save(model_folder, method, dataset, model, acc, ep):
     model.eval()
     model = model.cpu()
     trainable = {}
     for n, p in model.named_parameters():
         if 'adapter' in n or 'head' in n:
             trainable[n] = p.data
-    torch.save(trainable, './models/%s/%s.pt'%(method, dataset))
-    with open('./models/%s/%s.log'%(method, dataset), 'w') as f:
-        f.write(str(ep)+' '+str(acc))
-        
+    torch.save(trainable, './%s/%s/%s.pt' % (model_folder, method, dataset))
+    with open('./%s/%s/%s.log' % (model_folder, method, dataset), 'w') as f:
+        f.write(str(ep) + ' ' + str(acc))
 
-def load(method, dataset, model):
+
+def load(model_folder, method, dataset, model):
     model = model.cpu()
-    st = torch.load('./models/%s/%s.pt'%(method, dataset))
+    st = torch.load('./%s/%s/%s.pt' % (model_folder, method, dataset))
     model.load_state_dict(st, False)
     return model
 
-def get_config(method, dataset_name,few_shot=False):
+def get_config(method, dataset_name, few_shot=False):
     if few_shot:
         config_name = './configs/%s_few_shot/%s.yaml' % (method, dataset_name)
     else:

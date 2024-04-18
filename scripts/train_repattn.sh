@@ -3,5 +3,7 @@ echo "start"
 devices=$1
 method='repattn'
 dim=8
+sparse_lambda=0
+model_folder='models'
 scale=0
-bash scripts/exp.sh $devices $method  $dim  $scale  2>&1 | tee ./logs/repadapter-$method.log
+bash scripts/exp.sh $devices $method  $dim  $scale $sparse_lambda $model_folder 2>&1 | tee ./logs/repadapter-$method.log
